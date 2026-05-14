@@ -1,27 +1,38 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:8000/api",
+  baseURL: import.meta.env.VITE_API_URL,
+  withCredentials: true,
 });
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
-  if (token) config.headers.Authorization = `Bearer ${token}`;
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
   return config;
 });
 
 api.interceptors.response.use(
-  (res) => res,
-  (err) => {
-    if (err.response?.status === 401) {
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
       const path = window.location.pathname;
-      if (path !== "/login" && path !== "/register" && path !== "/") {
+
+      if (
+        path !== "/" &&
+        path !== "/login" &&
+        path !== "/register"
+      ) {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         window.location.href = "/login";
       }
     }
-    return Promise.reject(err);
+
+    return Promise.reject(error);
   }
 );
 
