@@ -10,8 +10,7 @@ import { notFound, errorHandler } from "./middlewares/errorHandler.js";
 
 const app = express();
 
-/* ---------------- CORS FIX (PRODUCTION SAFE) ---------------- */
-
+/* ---------------- CORS ---------------- */
 const allowedOrigins = (process.env.CLIENT_URL || "")
   .split(",")
   .map(o => o.trim())
@@ -21,7 +20,6 @@ const corsOptions = {
   origin: function (origin, cb) {
     if (!origin) return cb(null, true);
 
-    // allow localhost + deployed frontend
     if (
       allowedOrigins.includes(origin) ||
       origin.includes("localhost")
@@ -29,7 +27,7 @@ const corsOptions = {
       return cb(null, true);
     }
 
-    return cb(null, true); // safe fallback (prevents crash)
+    return cb(null, true);
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -68,7 +66,6 @@ app.use(async (req, res, next) => {
     await ensureDBConnection();
     next();
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "DB connection failed" });
   }
 });
@@ -83,20 +80,6 @@ app.use("/api/ai", aiRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-/* ---------------- SERVER ---------------- */
-const PORT = process.env.PORT || 8000;
-
-if (process.env.NODE_ENV !== "production") {
-  ensureDBConnection()
-    .then(() => {
-      app.listen(PORT, () =>
-        console.log(`Server running on ${PORT}`)
-      );
-    })
-    .catch((err) => {
-      console.error(err.message);
-      process.exit(1);
-    });
-}
-
+/* ---------------- VERCEL FIX ---------------- */
+// IMPORTANT: NO app.listen()
 export default app;
