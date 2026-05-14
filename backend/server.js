@@ -15,9 +15,10 @@ const app = express();
 /* ---------------- CORS CONFIG ---------------- */
 
 const allowedOrigins = [
+  process.env.FRONTEND_URL,
   "https://ai-habit-tracker-s73k.vercel.app",
   "http://localhost:5173"
-];
+].filter(Boolean);
 
 const corsOptions = {
   origin: function (origin, cb) {
@@ -39,7 +40,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options("*", corsOptions);
+app.options("*", cors(corsOptions));
 
 /* ---------------- MIDDLEWARE ---------------- */
 
