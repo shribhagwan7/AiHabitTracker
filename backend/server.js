@@ -16,27 +16,31 @@ const app = express();
 
 const allowedOrigins = [
   process.env.FRONTEND_URL,
+  ...(process.env.CLIENT_URL ? process.env.CLIENT_URL.split(",") : []),
   "https://ai-habit-tracker-s73k.vercel.app",
-  "http://localhost:5173"
-].filter(Boolean);
+  "http://localhost:5173",
+]
+  .filter(Boolean)
+  .map((origin) => origin.trim().replace(/\/$/, ""));
 
 const corsOptions = {
-  origin: function (origin, cb) {
+  origin(origin, cb) {
     if (!origin) return cb(null, true);
 
+    const normalizedOrigin = origin.trim().replace(/\/$/, "");
+
     if (
-      allowedOrigins.includes(origin) ||
-      origin.includes("localhost")
+      allowedOrigins.includes(normalizedOrigin) ||
+      normalizedOrigin.includes("localhost")
     ) {
       return cb(null, true);
     }
 
-    return cb(new Error("Not allowed by CORS"));
+    return cb(new Error(`Not allowed by CORS: ${origin}`));
   },
-
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 app.use(cors(corsOptions));
@@ -45,6 +49,16 @@ app.options("*", cors(corsOptions));
 /* ---------------- MIDDLEWARE ---------------- */
 
 app.use(express.json({ limit: "1mb" }));
+
+/* ---------------- ROUTES WITHOUT DB ---------------- */
+
+app.get("/", (req, res) => {
+  res.json({ message: "Backend running" });
+});
+
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok", time: new Date().toISOString() });
+});
 
 /* ---------------- DB CONNECTION ---------------- */
 
@@ -58,34 +72,26 @@ const ensureDBConnection = async () => {
   }
 };
 
-/* ---------------- ROUTES ---------------- */
-
-app.get("/", (req, res) => {
-  res.json({ message: "Backend running 🚀" });
-});
-
-app.get("/api/health", (req, res) => {
-  res.json({ status: "ok", time: new Date().toISOString() });
-});
-
-/* DB middleware */
+/* DB middleware only for API routes below */
 app.use(async (req, res, next) => {
   try {
     await ensureDBConnection();
     next();
   } catch (err) {
-    console.error(err);
+    console.error("DB connection failed:", err);
     res.status(500).json({ message: "DB connection failed" });
   }
 });
 
-/* API ROUTES */
+/* ---------------- API ROUTES ---------------- */
+
 app.use("/api/auth", authRoutes);
 app.use("/api/habits", habitRoutes);
 app.use("/api/logs", logRoutes);
 app.use("/api/ai", aiRoutes);
 
-/* ERROR HANDLERS */
+/* ---------------- ERROR HANDLERS ---------------- */
+
 app.use(notFound);
 app.use(errorHandler);
 
