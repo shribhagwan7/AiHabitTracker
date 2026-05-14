@@ -41,17 +41,19 @@ const features = [
 export default function Landing() {
   const { user } = useAuth();
   const { theme, toggle } = useTheme();
+
   if (user) return <Navigate to="/dashboard" replace />;
 
   return (
     <div className="min-h-screen">
       <header className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white flex items-center justify-center shadow-lg shadow-brand-500/30">
+          <div className="w-9 h-9 rounded-xl bg-linear-to-br from-brand-500 to-brand-700 text-white flex items-center justify-center shadow-lg shadow-brand-500/30">
             <Sparkles size={18} />
           </div>
           <span className="font-semibold text-lg">AI Habit Tracker</span>
         </div>
+
         <nav className="flex items-center gap-2">
           <button
             onClick={toggle}
@@ -60,9 +62,11 @@ export default function Landing() {
           >
             {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
           </button>
+
           <Link to="/login" className="btn-ghost">
             Log in
           </Link>
+
           <Link to="/register" className="btn-primary">
             Get started
           </Link>
@@ -76,24 +80,28 @@ export default function Landing() {
               <Sparkles size={12} />
               AI-powered habit coach
             </div>
+
             <h1 className="text-4xl md:text-6xl font-semibold tracking-tight leading-[1.08]">
               Build habits that stick,
               <br />
               with an AI that actually{" "}
-              <span className="bg-gradient-to-br from-brand-400 to-brand-700 bg-clip-text text-transparent">
+              <span className="bg-linear-to-br from-brand-400 to-brand-700 bg-clip-text text-transparent">
                 knows you
               </span>
               .
             </h1>
+
             <p className="mt-5 text-soft text-lg leading-relaxed max-w-xl mx-auto lg:mx-0">
               Track your habits, watch your streaks grow, and let AI turn your
               data into real encouragement — not generic motivation.
             </p>
+
             <div className="mt-8 flex items-center justify-center lg:justify-start gap-3">
               <Link to="/register" className="btn-primary px-5 py-3 text-base">
                 Start free
                 <ArrowRight size={16} />
               </Link>
+
               <Link to="/login" className="btn-secondary px-5 py-3 text-base">
                 I have an account
               </Link>
@@ -110,6 +118,7 @@ export default function Landing() {
             <div className="text-xs font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-300 mb-2">
               Today
             </div>
+
             <div className="space-y-3">
               {[
                 { icon: "💧", name: "Drink 2L water", done: true, streak: 12 },
@@ -118,22 +127,27 @@ export default function Landing() {
               ].map((h, i) => (
                 <div
                   key={i}
-                  className={`flex items-center gap-3 rounded-xl glass p-3 ${h.done ? "ring-1 ring-brand-500/30" : ""
-                    }`}
+                  className={`flex items-center gap-3 rounded-xl glass p-3 ${
+                    h.done ? "ring-1 ring-brand-500/30" : ""
+                  }`}
                 >
                   <span className="w-9 h-9 rounded-lg bg-brand-500/15 flex items-center justify-center">
                     {h.icon}
                   </span>
+
                   <div className="flex-1 text-sm font-medium">{h.name}</div>
+
                   <div className="flex items-center gap-1 text-xs text-muted">
                     <Flame size={12} className="text-orange-500" />
                     {h.streak}
                   </div>
+
                   <div
-                    className={`w-7 h-7 rounded-full flex items-center justify-center ${h.done
-                      ? "bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-md shadow-brand-500/30"
-                      : "border-2 border-[var(--surface-border)]"
-                      }`}
+                    className={`w-7 h-7 rounded-full flex items-center justify-center ${
+                      h.done
+                        ? "bg-linear-to-br from-brand-500 to-brand-700 text-white shadow-md shadow-brand-500/30"
+                        : "border-2 border-(--surface-border)"
+                    }`}
                   >
                     {h.done && <CheckCircle2 size={14} />}
                   </div>
@@ -150,17 +164,20 @@ export default function Landing() {
                   "radial-gradient(circle at 0% 0%, rgba(99,102,241,0.22), transparent 55%)",
               }}
             />
+
             <div className="relative">
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-300 mb-2">
                 <Sparkles size={12} />
                 AI Weekly Report
               </div>
+
               <p className="text-sm leading-relaxed">
                 Big week for hydration — 7/7 on <b>Drink 2L water</b>! Your
                 morning runs slipped to 3/5 on weekdays. Consistency pattern:
                 you're strongest Mon–Wed. Try prepping shoes by the door tonight
                 to protect tomorrow's momentum. Proud of you.
               </p>
+
               <div className="mt-6 grid grid-cols-3 gap-3">
                 {[
                   { label: "Streaks", value: "4" },
@@ -188,6 +205,7 @@ export default function Landing() {
             actual data.
           </p>
         </div>
+
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
           {features.map((f) => (
             <div key={f.title} className="card p-5">
@@ -204,35 +222,22 @@ export default function Landing() {
       </section>
 
       <section className="max-w-6xl mx-auto px-6 py-16">
-        <div className="relative p-10 text-center rounded-2xl overflow-hidden bg-gradient-to-br from-brand-600 to-brand-900 text-white shadow-2xl shadow-brand-500/30">
-          <div
-            className="absolute inset-0 pointer-events-none opacity-50"
-            style={{
-              background:
-                "radial-gradient(circle at 20% 10%, rgba(255,255,255,0.25), transparent 55%), radial-gradient(circle at 80% 80%, rgba(236,72,153,0.3), transparent 55%)",
-            }}
-          />
-          <div className="relative">
-            <div className="flex items-center justify-center gap-2 mb-3">
-              <Target size={18} />
-              <Activity size={18} />
-              <Sparkles size={18} />
-            </div>
-            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">
-              Your first streak is 3 clicks away.
-            </h2>
-            <p className="mt-3 text-brand-100 max-w-lg mx-auto">
-              Create your account, add a habit, check it off. That's the whole
-              onboarding.
-            </p>
-            <Link
-              to="/register"
-              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-white text-brand-700 px-5 py-3 text-sm font-semibold hover:bg-brand-50 transition shadow-xl"
-            >
-              Create my account
-              <ArrowRight size={16} />
-            </Link>
-          </div>
+        <div className="relative p-10 text-center rounded-2xl overflow-hidden bg-linear-to-br from-brand-600 to-brand-900 text-white shadow-2xl shadow-brand-500/30">
+          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">
+            Your first streak is 3 clicks away.
+          </h2>
+
+          <p className="mt-3 text-brand-100 max-w-lg mx-auto">
+            Create your account, add a habit, check it off. That's the whole onboarding.
+          </p>
+
+          <Link
+            to="/register"
+            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-white text-brand-700 px-5 py-3 text-sm font-semibold hover:bg-brand-50 transition shadow-xl"
+          >
+            Create my account
+            <ArrowRight size={16} />
+          </Link>
         </div>
       </section>
 
