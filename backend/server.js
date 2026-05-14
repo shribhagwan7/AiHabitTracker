@@ -2,19 +2,22 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { connectDB } from "./config/db.js";
+
 import authRoutes from "./routes/auth.js";
 import habitRoutes from "./routes/habits.js";
 import logRoutes from "./routes/logs.js";
 import aiRoutes from "./routes/ai.js";
+
 import { notFound, errorHandler } from "./middlewares/errorHandler.js";
 
 const app = express();
 
-/* ---------------- CORS ---------------- */
-const allowedOrigins = (process.env.CLIENT_URL || "")
-  .split(",")
-  .map(o => o.trim())
-  .filter(Boolean);
+/* ---------------- CORS CONFIG ---------------- */
+
+const allowedOrigins = [
+  "https://ai-habit-tracker-s73k.vercel.app",
+  "http://localhost:5173"
+];
 
 const corsOptions = {
   origin: function (origin, cb) {
@@ -27,20 +30,23 @@ const corsOptions = {
       return cb(null, true);
     }
 
-    return cb(null, true);
+    return cb(new Error("Not allowed by CORS"));
   },
+
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+app.options("*", corsOptions);
 
 /* ---------------- MIDDLEWARE ---------------- */
+
 app.use(express.json({ limit: "1mb" }));
 
-/* ---------------- DB ---------------- */
+/* ---------------- DB CONNECTION ---------------- */
+
 let isConnected = false;
 
 const ensureDBConnection = async () => {
@@ -52,6 +58,7 @@ const ensureDBConnection = async () => {
 };
 
 /* ---------------- ROUTES ---------------- */
+
 app.get("/", (req, res) => {
   res.json({ message: "Backend running 🚀" });
 });
@@ -66,11 +73,12 @@ app.use(async (req, res, next) => {
     await ensureDBConnection();
     next();
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "DB connection failed" });
   }
 });
 
-/* API routes */
+/* API ROUTES */
 app.use("/api/auth", authRoutes);
 app.use("/api/habits", habitRoutes);
 app.use("/api/logs", logRoutes);
@@ -80,6 +88,6 @@ app.use("/api/ai", aiRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-/* ---------------- VERCEL FIX ---------------- */
-// IMPORTANT: NO app.listen()
+/* ---------------- EXPORT FOR VERCEL ---------------- */
+
 export default app;
