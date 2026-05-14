@@ -14,45 +14,13 @@ const app = express();
 
 /* ---------------- CORS CONFIG ---------------- */
 
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  ...(process.env.CLIENT_URL ? process.env.CLIENT_URL.split(",") : []),
-  "https://ai-habit-tracker-s73k.vercel.app",
-  "http://localhost:5173",
-]
-  .filter(Boolean)
-  .map((origin) => origin.trim().replace(/\/$/, ""));
-
-const isAllowedOrigin = (origin) => {
-  if (!origin) return true;
-
-  const normalizedOrigin = origin.trim().replace(/\/$/, "");
-
-  return (
-    allowedOrigins.includes(normalizedOrigin) ||
-    normalizedOrigin.includes("localhost") ||
-    /^https:\/\/ai-habit-tracker-s73k(-[a-z0-9]+)?\.vercel\.app$/i.test(
-      normalizedOrigin
-    )
-  );
-};
-
 app.use((req, res, next) => {
-  const origin = req.headers.origin;
-
-  if (isAllowedOrigin(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin || "*");
-    res.setHeader("Vary", "Origin");
-    res.setHeader("Access-Control-Allow-Credentials", "true");
-    res.setHeader(
-      "Access-Control-Allow-Methods",
-      "GET,POST,PUT,PATCH,DELETE,OPTIONS"
-    );
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "Content-Type, Authorization"
-    );
-  }
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+  );
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
   if (req.method === "OPTIONS") {
     return res.status(204).end();
@@ -63,11 +31,9 @@ app.use((req, res, next) => {
 
 app.use(
   cors({
-    origin(origin, cb) {
-      if (isAllowedOrigin(origin)) return cb(null, true);
-      return cb(new Error(`Not allowed by CORS: ${origin}`));
-    },
-    credentials: true,
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -78,7 +44,7 @@ app.use(express.json({ limit: "1mb" }));
 /* ---------------- ROUTES WITHOUT DB ---------------- */
 
 app.get("/", (req, res) => {
-  res.json({ message: "Backend running - CORS fixed v2" });
+  res.json({ message: "Backend running - open CORS v3" });
 });
 
 app.get("/api/health", (req, res) => {
@@ -97,7 +63,6 @@ const ensureDBConnection = async () => {
   }
 };
 
-/* DB middleware only for API routes below */
 app.use(async (req, res, next) => {
   try {
     await ensureDBConnection();
