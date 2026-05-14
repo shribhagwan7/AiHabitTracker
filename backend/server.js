@@ -12,8 +12,6 @@ import { notFound, errorHandler } from "./middlewares/errorHandler.js";
 
 const app = express();
 
-/* ---------------- CORS CONFIG ---------------- */
-
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -37,11 +35,7 @@ app.use(
   })
 );
 
-/* ---------------- MIDDLEWARE ---------------- */
-
 app.use(express.json({ limit: "1mb" }));
-
-/* ---------------- ROUTES WITHOUT DB ---------------- */
 
 app.get("/", (req, res) => {
   res.json({ message: "Backend running - open CORS v3" });
@@ -50,8 +44,6 @@ app.get("/", (req, res) => {
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", time: new Date().toISOString() });
 });
-
-/* ---------------- DB CONNECTION ---------------- */
 
 let isConnected = false;
 
@@ -73,18 +65,12 @@ app.use(async (req, res, next) => {
   }
 });
 
-/* ---------------- API ROUTES ---------------- */
-
 app.use("/api/auth", authRoutes);
 app.use("/api/habits", habitRoutes);
 app.use("/api/logs", logRoutes);
 app.use("/api/ai", aiRoutes);
 
-/* ---------------- ERROR HANDLERS ---------------- */
-
 app.use(notFound);
 app.use(errorHandler);
-
-/* ---------------- EXPORT FOR VERCEL ---------------- */
 
 export default app;
